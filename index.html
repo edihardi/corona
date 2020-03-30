@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.css">
+    
+    <title>Pantau COVID-19</title>
+</head>
+
+<body>
+    <div class="jumbotron jumbotron-fluid bg-primary text-white">
+        <div class="container text-center">
+            <h1 class="display-4">Corona Virus</h1>
+            <p class="lead">
+                <h2>PANTAU PENYEBARAN VIRUS COVID-19 DI DUNIA
+                    <br>SECARA REAL-TIME
+                    <br> Mari bersama menjaga kesehatan dan #dirumahaja.
+                </h2>
+            </p>
+        </div>
+    </div>
+
+    <style>
+        .box{
+            padding: 30px 40px;
+            border-radius: 5px;
+        }
+    </style>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="bg-danger box text-white">
+                   <div class="row">
+                       <div class="col-md-6">
+                           <h5>Positif</h5>
+                           <h2 id="data-kasus"> 0 </h2>
+                           <h5>orang </h5>
+                       </div>
+                       <div class="col-md-4">
+                           <img src="img/sad.svg" style="width: 100px;">
+                       </div>
+                   </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="bg-info box text-white">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Meninggal</h5>
+                            <h2 id="data-mati"> 0 </h2>
+                            <h5>orang </h5>
+                        </div>
+                        <div class="col-md-4">
+                            <img src="img/cry.svg" style="width: 100px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="bg-success box text-white">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Sembuh</h5>
+                            <h2 id="data-sembuh"> 0 </h2>
+                            <h5>orang </h5>
+                        </div>
+                        <div class="col-md-4">
+                            <img src="img/happy.svg" style="width: 100px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 mt-3">
+                <div class="bg-primary box text-white">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h2>INDONESIA</h2>
+                            <h5 id="data-id"> Positif : 0 orang <br> Meninggal : 0 orang <br> Sembuh : 0 orang</h5>
+                        </div>
+                        <div class="col-md-4">
+                            <img src="img/indonesia.svg" style="width: 150px;">
+                        </div>
+
+                        <div class="col-md-2">
+                            <img src="img/aceh.svg" style="width: 150px;">
+                        </div>
+                        <div class="col-md-3">
+                            <h2>ACEH</h2>
+                            <h5 id="data-aceh"> Positif : 0 orang <br> Meninggal : 0 orang <br> Sembuh : 0 orang</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-primary text-center text-white mt-3 pt-2 pb-2">
+        Dibuat oleh Edi Hardiansyah
+    </footer>
+
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+</body>
+
+</html>
+
+<script>
+    $(document).ready(function() {
+        // panggil fungsi menampilkan semua data global
+        semuaData();
+        dataNegara();
+        dataAceh();
+
+        // refresh otomatis
+        setInterval(function() {
+            semuaData();
+            dataNegara();
+            dataAceh();            
+        }, 3000);
+
+        // ambil data global dari API
+        function semuaData() {
+            $.ajax({
+                url : 'https://coronavirus-19-api.herokuapp.com/all' , success : function(data) {
+                    try{
+                        let json = data;
+                        let kasus = data.cases;
+                        let meninggal = data.deaths;
+                        let sembuh = data.recovered;
+
+                        $('#data-kasus').html(kasus);
+                        $('#data-mati').html(meninggal);
+                        $('#data-sembuh').html(sembuh);
+                    }catch{
+                        alert('Error');
+                    }
+                }
+            });
+        }
+
+
+        // ambil data negara dari API
+        function dataNegara() {
+            $.ajax({
+                url : 'https://coronavirus-19-api.herokuapp.com/countries' , success : function(data) {
+                    try{
+                        let json = data;
+                        let html = [];
+
+                        if (json.length > 0) {
+                            let i;
+                            for(i = 0; i < json.length; i++){
+                                let dataNegara = json[i];
+                                let namaNegara = dataNegara.country;
+
+                                if(namaNegara === 'Indonesia'){
+                                    let kasus = dataNegara.cases;
+                                    let meninggal = dataNegara.deaths;
+                                    let sembuh = dataNegara.recovered;
+                                    $('#data-id').html('Positif : '+kasus+' orang <br> Meninggal : '+meninggal+' orang <br> Sembuh : '+sembuh+' orang')
+                                }
+                            }
+                        }
+                    }catch{
+                        alert('Error');
+                    }
+                }
+            });
+        }
+
+        // ambil data Aceh dari API
+        function dataAceh() {
+            $.ajax({
+                url : 'https://api.kawalcorona.com/indonesia/provinsi' , success : function(data) {
+                    try{
+                        let json = data;
+                        let html = [];
+
+                        if (json.length > 0) {
+                            let i;
+                            for(i = 0; i < json.length; i++){
+                                let dataAceh = json[i];
+                                let namaAceh = dataAceh.Provinsi;
+
+                                if(namaAceh === 'Aceh' ){
+                                    let kasus = dataAceh.Kasus_Posi;
+                                    let meninggal = dataAceh.Kasus_Meni;
+                                    let sembuh = dataAceh.Kasus_Semb;
+                                    $('#data-aceh').html('Positif : '+kasus+' orang <br> Meninggal : '+meninggal+' orang <br> Sembuh : '+sembuh+' orang')
+                                }
+                            }
+                        }
+                    }catch{
+                        alert('Error');
+                    }
+                }
+            });
+        }
+
+
+    })
+
+
+
+
+
+</script>
